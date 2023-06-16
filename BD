@@ -1,0 +1,1203 @@
+/* Inicio de tablas fuertes */
+/*---------------------------------------------------------------------*/
+
+create table Color (
+UID_Color serial Primary key not null, 
+Nombre	varchar(50) unique not null
+);
+
+Create table Objeto (
+UID_Obj serial Primary key not null,
+Nombre varchar(100) not null,
+Material_Fabricacion varchar(70) not null,
+Tipo_Obj varchar(100) not null,
+Descripcion varchar(280) not null
+);
+
+Create table Poder (
+UID_Poder serial Primary key not null,
+Nombre varchar(60) unique not null,
+Descripcion varchar(280) not null
+);
+
+Create table Ocupacion (
+UID_Ocupacion serial Primary key not null,
+Nombre varchar(60) unique not null
+);
+
+Create table Organizacion(
+UID_Organizacion serial Primary key not null,
+Nombre varchar(60) unique not null,
+Eslogan varchar(280) not null,
+Tipo_Org varchar(60) not null,
+Objetivo_principal varchar(280) not null,
+Primera_aparicion date not null
+);
+
+Create table Nacionalidad(
+UID_Nacionalidad serial Primary key not null,
+Nombre_Nacionalidad varchar(60) not null
+);
+
+Create table Plataforma (
+UID_Plataforma serial primary key not null,
+Nombre varchar(60) unique not null
+);
+
+Create table Pais (
+UID_Pais serial primary key not null,
+Nombre varchar(60) unique not null,
+Continente char(2) not null,
+constraint Continente_Posible CHECK (
+   Continente like 'AS' or Continente like 'AM' or Continente like 'AN' or Continente like 'EU' or Continente like 'OC')
+);
+
+Create table Persona (
+UID_Persona serial primary key not null,
+Primer_Nombre varchar(40) not null,
+Segundo_Nombre varchar(40),
+Primer_Apellido varchar(40) not null,
+Segundo_Apellido varchar(40),
+Tipo_Creador_Serie Bool,
+Tipo_Director Bool,
+Tipo_Creador_Personaje bool,
+Tipo_Actor bool,
+CONSTRAINT CK_Tipo_creador CHECK (Tipo_Creador_Serie OR Tipo_Director OR Tipo_Creador_Personaje OR Tipo_Actor)
+);
+
+Create table Medio (
+UID_Medio serial primary key not null,
+Fecha_Estreno date not null,
+Compañia varchar(60) not null,
+Titulo varchar(280) not null,
+Sinopsis varchar(400) not null,
+Saga varchar(280),
+Tipo_Medio char(1) not null,
+constraint Tipo_Medio_Posible CHECK (
+	Tipo_Medio like 'V' or Tipo_Medio like 'S' or Tipo_Medio like 'P')
+);
+
+/*---------------------------------------------------------------------*/
+/* Tablas con claves foraneas */
+/*---------------------------------------------------------------------*/
+
+Create table Video_juego (
+UID_Medio int not null Primary key,
+Tipo_Juego varchar(60) not null,
+Publicadora varchar(60) not null,
+	constraint FK_Medio foreign key (UID_Medio) references Medio(UID_Medio) on delete cascade
+);
+
+Create table Serie (
+UID_Medio int not null Primary key,
+Total_Cap int not null,
+Canal_Transmitido varchar(60) not null,
+Tipo_Serie varchar(60) not null,
+	constraint FK_Medio foreign key (UID_Medio) references Medio(UID_Medio) on delete cascade
+);
+
+Create table Pelicula (
+UID_Medio int not null Primary key,
+Duracion int not null,
+Distribuidor varchar(60) not null,
+Coste_produccion float NOT NULL,
+Ganancia float not null,
+Tipo_Pelicula varchar(60) not null,
+	constraint FK_Medio foreign key (UID_Medio) references Medio(UID_Medio) on delete cascade,
+	constraint CK_Coste_Ganancia_Duraccion check ((Coste_produccion>=0) and (Ganancia>=0) and (Duracion>0))   
+);
+
+create table Estado (
+UID_Estado serial not null,
+Nombre varchar(60) not null,
+UID_Pais int not null references Pais(UID_Pais) on delete cascade,
+	constraint PK_Estado primary key (UID_Estado, UID_Pais)
+);
+
+create table Ciudad (
+UID_Ciudad serial not null,
+Nombre varchar(60) not null,
+UID_Estado int not null,
+UID_Pais int not null,
+	constraint FK_Estado foreign key (UID_Estado, UID_Pais) references Estado (UID_Estado, UID_Pais) on delete cascade,
+	constraint PK_Ciudad primary key (UID_Ciudad, UID_Estado, UID_Pais)
+);
+
+create table Sector (
+UID_Sector serial not null,
+Nombre varchar(60) not null,
+UID_Ciudad int not null,
+UID_Estado int not null,
+UID_Pais int not null,
+	constraint FK_Ciudad foreign key (UID_Ciudad, UID_Estado, UID_Pais) references Ciudad (UID_Ciudad, UID_Estado, UID_Pais) on delete cascade,
+	constraint PK_Sector primary key (UID_Sector,UID_Ciudad, UID_Estado, UID_Pais)
+);
+
+CREATE TABLE Personaje (
+ID_Personaje serial primary key not null,
+Primer_Nombre varchar (40) not null,
+Segundo_Nombre varchar(40),
+Primer_Apellido varchar(40) not null,
+Segundo_Apellido varchar(40),
+Genero char(1) not null,
+Est_Civil char (2) not null,
+Primera_Aparicion date not null,
+Frase_Celebre varchar(280) not null,
+Tipo_Personaje char(1) not null,
+UID_Color_Pelo int not null references Color(UID_Color),
+UID_Color_Ojos int not null references Color(UID_Color),
+	constraint Tipo_Personaje_posible check (Tipo_Personaje like 'H' or Tipo_Personaje like 'V' or Tipo_Personaje like 'C'),
+	CONSTRAINT Genero_posible check (Genero like 'F'or Genero like 'M'or Genero like 'D'or Genero like 'O'),
+	constraint Est_Civil_posible check (Est_Civil like 'SO' or Est_Civil like 'CA' or Est_Civil like 'VI' or Est_Civil like 'SE' or Est_Civil like 'DI')
+);
+
+create table Villano (
+ID_Personaje int primary key not null references Personaje(ID_Personaje) on DELETE cascade,
+Nombre_Heroe varchar(60) not null,
+Objetivo varchar(100) not null
+);
+
+create table Heroe (
+ID_Personaje int primary key not null references Personaje(ID_Personaje) on delete cascade,
+Nombre_Heroe varchar(60) not null,
+Logotipo varchar(500) not null,
+ID_Personaje_Archienemigo int not null,
+	constraint FK_ID_Personaje_Archienemigo Foreign key (ID_Personaje_Archienemigo) references Villano(ID_Personaje)
+);
+
+create table Premio (
+UID_Premio serial primary key not null,
+Nombre_Premio varchar(60) not null,
+UID_Medio int not null,
+ constraint FK_Medio foreign key (UID_Medio) references Video_Juego (UID_Medio) on delete cascade
+);
+
+create table Aparicion_Organizacion(
+UID_Medio int not null references Medio(UID_Medio) on delete cascade,
+UID_Organizacion int not null references Organizacion (UID_Organizacion) on delete cascade,
+Protagonismo char (1) not null,
+Estado varchar (60),
+	constraint Protagonismo_posible check (Protagonismo like 'P' or Protagonismo like 'S' or Protagonismo like 'A'),
+	constraint PK_Aparicion_Organizacion primary key (UID_Medio,UID_Organizacion)
+);
+
+create table Usuario (
+Usuario varchar(60) primary key not null,
+Correo_Electronico varchar(256) unique not null,
+Primer_Nombre varchar(60) not null,
+Segundo_Nombre varchar(60),
+Primer_Apellido varchar(60) not null,
+Segundo_Apellido varchar(60),
+Contrasena varchar(60) not null,
+Fecha_Nacimiento date not null,
+Genero char(1),
+Nro_Tarjeta varchar(18) not null,
+UID_Pais int not null 
+	constraint Genero_posible check (Genero like 'M' or Genero like 'F' or Genero like 'D' or Genero like 'O'),
+	constraint Ck_Correo_Electronico check ((Correo_Electronico like '%@gmail.com') or (Correo_Electronico like '%@hotmail.com') or (Correo_Electronico like '%@Outlook.com')),
+	constraint CK_Nro_tarjeta check ((Nro_Tarjeta like '[0-9]') AND (LENGTH(Nro_Tarjeta)>=13) or  (LENGTH(Nro_Tarjeta)<=18)),
+	constraint FK_UID_Pais foreign key (UID_Pais) references Pais(UID_Pais)
+); 
+
+create table Perfil (
+UID_Perfil serial not null,
+Nombre varchar(60) not null,
+Correo_Notificacion varchar(256),
+Usuario varchar(60) not null,
+ constraint Ck_Correo_Notificacion check ((Correo_Notificacion like '%@gmail.com') or (Correo_Notificacion like '%@hotmail.com') or (Correo_Notificacion like '%@Outlook.com')),
+ CONSTRAINT FK_Usuario foreign key (Usuario) references Usuario(Usuario) on delete cascade,
+ constraint PK_Perfil primary key (UID_Perfil, Usuario)
+);
+
+CREATE TABLE Vio_Agrado (
+    Fecha_Visualizacion timestamp NOT NULL,
+    Critica varchar(280),
+    Calificacion int,
+    Hora_fin timestamp,
+    UID_Medio int NOT NULL REFERENCES Medio(UID_Medio) ON DELETE CASCADE,
+    UID_Perfil int NOT NULL,
+    Usuario varchar(60) NOT NULL,
+    CONSTRAINT Hora_Ck CHECK (Fecha_Visualizacion <= Hora_Fin),
+    CONSTRAINT Critica_posible CHECK (Calificacion >= 1 AND Calificacion <= 5),
+    CONSTRAINT FK_Perfil FOREIGN KEY (UID_Perfil, Usuario)
+        REFERENCES Perfil (UID_Perfil, Usuario)
+        ON DELETE CASCADE,
+    CONSTRAINT PK_Vio_Agrado PRIMARY KEY (Fecha_Visualizacion, UID_Perfil, Usuario)
+);
+
+create table Membresia (
+Codigo serial not null,
+Fecha_fin date,
+Fecha_inicio date not null,
+Tipo_Membresia char(1) not null,
+Tarifa float not null, 
+Descripcion varchar(280) not null,
+Usuario varchar(60) not null references Usuario(Usuario) on delete cascade,
+	constraint Tipo_Membresia_posible check (Tipo_Membresia like 'F' or Tipo_Membresia like 'G' or Tipo_Membresia like 'P' or Tipo_Membresia like 'V'),
+	Constraint Tipo_Tarifa check ((Tarifa=0) or (Tarifa=4.99) or (Tarifa=9.99) or (Tarifa=14.99)),
+	constraint CK_Fecha_fin check (Fecha_fin >=Fecha_inicio),
+	constraint PK_Membresia primary key (Codigo, Usuario)
+);
+
+create table Combate (
+UID_Combate serial not null primary key,
+Fecha date not null,
+UID_Sector int not null,
+UID_Ciudad int not null,
+UID_Estado int not null,
+UID_Pais int not null,
+	constraint FK_Sector foreign key (UID_Sector, UID_Ciudad, UID_Estado, UID_Pais) references Sector (UID_Sector, UID_Ciudad, UID_Estado, UID_Pais) on delete cascade
+);
+
+create table Sede (
+UID_sede serial not null,
+Nombre varchar(60) not null,
+Tipo_edif varchar not null,
+Sede_Origen bool,
+UID_Sector int not null,
+UID_Ciudad int not null,
+UID_Estado int not null,
+UID_Pais int not null,
+UID_Organizacion int not null references Organizacion (UID_Organizacion) on delete cascade,
+	constraint PK_Sede primary key (UID_sede, UID_Organizacion),
+	constraint FK_Sector foreign key (UID_Sector,UID_Ciudad, UID_Estado, UID_Pais) references Sector(UID_Sector, UID_Ciudad, UID_Estado, UID_Pais) on delete cascade
+);
+
+create table Reparto (
+UID_Persona int not null references Persona(UID_Persona) on delete cascade,
+UID_Medio int not null references Medio (UID_Medio) on delete cascade,
+ID_Personaje int not null references Personaje (ID_Personaje) on delete cascade,
+Tipo_papel char (1) not null,
+Tipo_actor 	char (1) not null,
+	constraint Tipo_papel_posible check (Tipo_papel like 'P' or Tipo_papel like 'A' or Tipo_papel like 'S'),
+	constraint Tipo_Actor_posible check (Tipo_Actor like 'V' or Tipo_Actor like 'I'),
+	constraint PK_Reparto primary key (UID_Persona, UID_Medio, ID_Personaje)
+);
+
+/*--------------------------------------------------------*/
+/*Tablas de intercepcion*/
+/*--------------------------------------------------------*/
+
+create table Lista_Plataforma (
+UID_Medio int not null references Video_Juego (UID_Medio) on delete cascade,
+UID_Plataforma int not null references Plataforma (UID_Plataforma) on delete cascade,
+	constraint PK_Lista_Plataforma primary key (UID_Medio, UID_Plataforma)
+);
+
+create table Lista_Medio (
+UID_Medio int not null references Medio(UID_Medio) on delete cascade,
+UID_Personaje int not null references Personaje(ID_Personaje) on delete cascade,
+	constraint PK_Lista_Medio primary key (UID_Medio, UID_Personaje)
+);
+
+create table Lista_Objeto (
+ID_Personaje int not null references Personaje(ID_Personaje) on delete cascade,
+UID_Objeto int not null references Objeto(UID_Obj) on delete cascade,
+	constraint PK_Lista_Objeto primary key (ID_Personaje, UID_Objeto)
+);
+
+create table Lista_Creador_Obj(
+ID_Personaje int not null references Personaje(ID_Personaje) on delete cascade,
+UID_Objeto int not null references Objeto(UID_Obj) on delete cascade,
+	constraint PK_Lista_Creador_Obj primary key (ID_Personaje, UID_Objeto)
+);
+
+create table Participante (
+UID_Combate int not null references Combate (UID_Combate),
+ID_Personaje int not null references Personaje(ID_Personaje),
+	constraint PK_Participante primary key (UID_Combate, ID_Personaje)
+);
+Create table Lista_Poder_Participante (
+UID_Combate int not null, 
+ID_Personaje int not null, 
+UID_Poder int not null references Poder(UID_Poder) on delete cascade,
+	constraint FK_Participante foreign key (UID_Combate, ID_Personaje) references Participante (UID_Combate,ID_Personaje) on delete cascade,
+	constraint PK_Lista_Poder_Participante primary key (UID_Combate, ID_Personaje, UID_Poder)
+);
+
+Create table Lista_Objeto_Combate (
+UID_Combate int not null references combate (UID_Combate) on delete cascade, 
+UID_Obj int not null references Objeto (UID_Obj) on delete cascade,
+	constraint PK_Lista_Objeto_Combate primary key (UID_Combate, UID_Obj)
+);
+
+create table Ejerce (
+UID_Ocupacion int not null references Ocupacion(UID_Ocupacion) on delete cascade,
+ID_Personaje int not null references Personaje (ID_Personaje) on delete cascade,
+	Constraint PK_Ejerce primary key (UID_Ocupacion, ID_Personaje)
+);
+
+create table Lista_Cargo(
+UID_Organizacion int not null references Organizacion (UID_Organizacion) on delete cascade,
+ID_Personaje int not null references Personaje (ID_Personaje) on delete cascade,
+Cargo varchar(60) not null, 
+	constraint PK_Lista_Cargo primary key (UID_Organizacion, ID_Personaje)
+);
+
+create table Lista_Nacionalidad(
+UID_Nacionalidad int not null references Nacionalidad (UID_Nacionalidad) on delete cascade,
+ID_Personaje int not null references Personaje(ID_Personaje) on delete cascade,
+Principal bool, 
+	constraint PK_Lista_Nacionalidad primary key (UID_Nacionalidad, ID_Personaje)
+);
+
+create table Escritor (
+UID_Persona int not null references Persona(UID_Persona) on delete cascade,
+ID_Personaje int not null references Personaje(ID_Personaje) on delete cascade,
+	constraint PK_Escritor primary key (UID_Persona, ID_Personaje)
+);
+
+Create table Restriccion (
+UID_Pais int not null references Pais(UID_Pais) on delete cascade,
+UID_Medio int not null references Medio(UID_Medio) on delete cascade,
+	constraint PK_Restriccion primary key(UID_Pais, UID_Medio)
+); 
+
+create table Lista_Poder (
+UID_Poder int not null references Poder(UID_Poder) on delete cascade,
+ID_Personaje int not null references Personaje (ID_Personaje) on delete cascade,
+Tipo_Poder char(1) not null,
+	constraint Tipo_Poder_posible check (Tipo_Poder like 'A' or Tipo_Poder like 'N' or Tipo_Poder like 'H'),
+    constraint PK_Lista_Poder primary key (UID_Poder, ID_Personaje)
+);
+
+create table Traje (
+UID_Traje serial not null,
+UID_Color int not null references Color(UID_Color) on delete cascade,
+ID_Personaje int not null references Personaje (ID_Personaje) on delete cascade,
+ constraint PK_Traje primary key (UID_Traje, UID_Color, ID_Personaje)
+);
+
+create table Relacion (
+ID_Personaje_uno int not null references Personaje (ID_Personaje) on delete cascade,
+ID_Personaje_dos int not null references Personaje (ID_Personaje) on delete cascade,
+Tipo_Relacion varchar(60) not null,
+	constraint CH_Relacion check (ID_Personaje_uno <> ID_Personaje_dos),
+	constraint PK_Relacion primary key (ID_Personaje_uno, ID_Personaje_dos, Tipo_Relacion)
+);
+
+create table Lista_Creador (
+UID_Medio int not null references Serie (UID_Medio) on delete cascade,
+UID_Persona int not null references Persona (UID_Persona) on delete cascade,
+	Constraint PK_Lista_Creador primary key(UID_Medio, UID_Persona)
+);
+
+create table Lista_Director (
+UID_Medio int not null references Pelicula (UID_Medio) on delete cascade,
+UID_Persona int not null references Persona (UID_Persona) on delete cascade,
+	Constraint PK_Lista_Director primary key(UID_Medio, UID_Persona)
+);
+
+Create table Lista_Gusto (
+UID_Perfil int not null,
+Usuario varchar (60) not null,
+UID_Medio int not null references Medio(UID_Medio) on delete cascade,
+	constraint fk_perfil_lista_gusto foreign key (UID_Perfil, Usuario) references perfil(UID_Perfil, Usuario) on delete cascade,
+	constraint PK_Lista_Gusto primary key (UID_Perfil, Usuario, UID_Medio)
+);
+
+
+/*---------------------------------------------------------------------*/
+/*                   Fin de la creacion de tablas                      */
+/*---------------------------------------------------------------------*/
+/*                            Funciones                                */
+/*---------------------------------------------------------------------*/
+
+--Comienco de funcion de mensaje de error
+
+CREATE FUNCTION Prmio_Mensaje_Error_FK() RETURNS TRIGGER AS $$
+
+BEGIN
+  RAISE EXCEPTION 'Error (4010): Incumplimiento de FK, no existe el medio';
+END;
+$$ LANGUAGE plpgsql;
+
+
+CREATE FUNCTION Personaje_Mensaje_Error_FK() RETURNS TRIGGER AS $$
+
+BEGIN
+  RAISE EXCEPTION 'Error (4002): Error en inserción de clave foránea, no existe el Personaje';
+END;
+$$ LANGUAGE plpgsql;
+
+--Fin de funcion de mensaje de error 
+--comienzo de funcion de costo 
+
+CREATE FUNCTION Costo() RETURNS TRIGGER AS $$
+BEGIN	
+  IF NEW.Coste_produccion < NEW.Ganancia THEN
+    RAISE NOTICE 'Error (4001): La ganancia es menor que el costo de producción.';
+  END IF;
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+create function Mensaje_Error_FK () RETURNS TRIGGER 
+AS $$
+	Begin
+		RAISE EXCEPTION 'Error (4002): Error en insercion de clave foranea, por favor revise los valores';	
+	end;
+$$ Language plpgsql;
+
+-- Fin de funcion de costo
+--funcion para comprobar si exite
+
+CREATE FUNCTION existe_ID_Personaje (id_personaje_dos integer) RETURNS boolean AS $$
+BEGIN
+  RETURN EXISTS (SELECT 1 FROM personaje WHERE id_personaje = id_personaje_dos);
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE FUNCTION existe_UID_MEDIO (UID_Medio_dos integer) RETURNS boolean AS $$
+BEGIN
+  RETURN EXISTS (SELECT 1 FROM Medio WHERE UID_Medio = UID_Medio_dos);
+END;
+$$ LANGUAGE plpgsql;
+ 
+CREATE FUNCTION existe_UID_Pais_Usuario (uid_pais_dos integer) RETURNS boolean AS $$
+BEGIN
+  RETURN EXISTS (SELECT 1 FROM pais WHERE uid_pais = uid_pais_dos);
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE FUNCTION existe_ID_medio_premio (UID_Medio_dos integer) RETURNS boolean AS $$
+BEGIN
+  RETURN EXISTS (SELECT 1 FROM Premio WHERE UID_Medio = UID_Medio_dos);
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE FUNCTION existe_UID_usuario (usuario_dos varchar(60)) RETURNS boolean AS $$
+BEGIN
+  RETURN EXISTS (SELECT 1 FROM usuario WHERE usuario = usuario_dos);
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE FUNCTION existe_UID_perfil (UID_Usario_dos integer) RETURNS boolean AS $$
+BEGIN
+  RETURN EXISTS (SELECT 1 FROM perfil WHERE UID_perfil = UID_Usario_dos);
+END;
+$$ LANGUAGE plpgsql;
+ 
+--Fin de funcion de comprobacion de existencia 
+-- comienzo de funcion de validaciones
+
+--((NEW.Correo_Electronico like '%@gmail.com') or (NEW.Correo_Electronico like '%@hotmail.com') or (NEW.Correo_Electronico like '%@Outlook.com')) = FALSE
+--new.correo_electronico not in ('%@gmail.com','%@hotmail.com', '%@Outlook.com')
+CREATE FUNCTION Validacion_Perfil() RETURNS TRIGGER AS $$
+Declare
+		aux int;
+ BEGIN
+  Select  count (*) into aux from Perfil where usuario = new.usuario;
+	if (5< aux) then
+		RAISE EXCEPTION 
+		'Error (4023): No puede crear un nuevo perfil, ya tiene 5 perfiles activos';
+	end if;
+	
+	if (aux<5) then
+		if (new.Correo_Notificacion is not null) then
+  			IF (((NEW.Correo_Notificacion like '%@gmail.com') or (NEW.Correo_Notificacion like '%@hotmail.com') or (NEW.Correo_Notificacion like '%@Outlook.com')) = FALSE) THEN
+    			RAISE EXCEPTION 'Error (4014): Correo electronico sin el terminal @gmail.com, @hotmail.com o @Outlook.com';
+  			END IF;
+  		end if; 
+	end if;
+	RETURN New;
+ END;
+$$ LANGUAGE plpgsql;
+
+create function CK_Persona_Mensaje () returns Trigger 
+as $$
+	begin
+	 RAISE EXCEPTION 'Error (4003): La persona no es ninguna de las opciones';
+	end;
+$$ language plpgsql;
+
+create function CK_Pais() RETURNS TRIGGER 
+as $$
+	begin
+	  RAISE EXCEPTION 'Error (4004): Opcion de continente invalido';
+	end;
+$$ LANGUAGE plpgsql;
+
+create function CK_Medio() RETURNS TRIGGER 
+as $$
+	begin
+	  RAISE EXCEPTION 'Error (4005): Opcion de tipo de medio invalido';
+	end;	
+$$ LANGUAGE plpgsql;
+
+
+CREATE FUNCTION CK_Personaje() RETURNS TRIGGER AS $$
+BEGIN
+  IF (NEW.Tipo_Personaje NOT IN ('H', 'V', 'C')) THEN
+    RAISE EXCEPTION 'Error (4007): Opcion de tipo de personaje invalido';
+  END IF;
+
+  IF (NEW.Genero NOT IN ('F', 'M', 'D', 'O')) THEN
+    RAISE EXCEPTION 'Error (4008): Opcion de tipo de genero invalido';
+  END IF;
+
+  IF (NEW.Est_Civil NOT IN ('SO', 'CA', 'VI', 'SE', 'DI')) THEN
+    RAISE EXCEPTION 'Error (4009): Opcion de estado civil invalido';
+  END IF;
+
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE FUNCTION Validacion_Aparicion() RETURNS TRIGGER AS $$
+BEGIN
+  IF (NEW.Protagonismo NOT IN ('P', 'S', 'A')) THEN
+    RAISE EXCEPTION 'Error (4011): Opcion de tipo de personaje invalido';
+  END IF;
+
+  IF (NOT  existe_UID_MEDIO (NEW.UID_Medio)) THEN
+    RAISE EXCEPTION 'Error (4012): Clave foranea de medio no exite';
+  END IF;
+
+	  IF (NOT  existe_UID_MEDIO (new.UID_Organizacion)) THEN
+    RAISE EXCEPTION 'Error (4013): Clave foranea de Pais no existe';
+  END IF;
+  
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+--new.correo_electronico not in ('%@gmail.com','%@hotmail.com', '%@Outlook.com')
+
+CREATE FUNCTION Validacion_usario() RETURNS TRIGGER AS $$
+BEGIN
+  IF (NEW.Genero NOT IN ('F', 'M', 'D', 'O')) THEN
+    RAISE EXCEPTION 'Error (4008): Opcion de tipo de genero invalido';
+  END IF;
+
+  IF (((NEW.Correo_Electronico like '%@gmail.com') or (NEW.Correo_Electronico like '%@hotmail.com') or (NEW.Correo_Electronico like '%@Outlook.com')) = FALSE) THEN
+    RAISE EXCEPTION 'Error (4014): Correo electronico sin el terminal @gmail.com, @hotmail.com o @Outlook.com';
+  END IF;
+
+  IF (((NEW.Nro_Tarjeta ~ '^[0-9]+$') and ((LENGTH(NEW.Nro_Tarjeta) >= 13) and (LENGTH(NEW.Nro_Tarjeta) <= 18)))= false) THEN
+    RAISE EXCEPTION 'Error (4015): Numero de tarjeta de credito invalido';
+  END IF;
+
+  IF (NOT existe_UID_Pais_Usuario(NEW.UID_Pais)) THEN
+    RAISE EXCEPTION 'Error (4013): Clave foranea de Pais no existe';
+  END IF;
+
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE FUNCTION Validacion_Vio_Agrado() RETURNS TRIGGER AS $$
+BEGIN
+  IF ((new.Fecha_Visualizacion<new.Hora_Fin)= false) THEN
+    RAISE EXCEPTION 'Error (4016): Hora de finalizacion es menor que la hora de inicio';
+  END IF;
+
+  IF ((new.Calificacion>=1 and new.Calificacion<=5)=false) THEN
+    RAISE EXCEPTION 'Error (4017): Calificacion inadecuado con politicas';
+  END IF;
+
+  IF (NOT existe_UID_usuario (NEW.Usuario)) THEN
+    RAISE EXCEPTION 'Error (4018): Usuario no existe';
+  END IF;
+
+  IF (NOT existe_UID_perfil(NEW.UID_Perfil)) THEN
+    RAISE EXCEPTION 'Error (4019): Clave foranea de perfil no existe';
+  END IF;
+  return new;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE FUNCTION Validacion_Membresia() RETURNS TRIGGER AS $$
+BEGIN
+		IF (new.Tipo_Membresia Not in ('F','G','P','V')) THEN
+    		RAISE EXCEPTION 'Error (4020): Tipo de membresia invalida';
+ 		 END IF;
+
+ 		 IF (new.Tarifa not in (0 , 4.99,9.99,14.99)) THEN
+    		RAISE EXCEPTION 'Error (4021): Precio no estipulado';
+		 END IF;
+
+  		IF ((new.Fecha_fin >= new.Fecha_inicio)=false) THEN
+    		RAISE EXCEPTION 'Error (4022): Fecha de finalizacion es menor a la fecha de inicio de la membresia';
+  		END IF;
+
+ 		IF (NOT existe_UID_usuario (NEW.usuario)) THEN
+    		RAISE EXCEPTION 'Error (4019): Clave foranea de Pais no existe';
+  		END IF;
+		return new;
+END;
+$$ LANGUAGE plpgsql;
+
+/*---------------------------------------------------------------------*/
+/*                          fin de Funciones                           */
+/*---------------------------------------------------------------------*/
+/*                            trigger                                  */
+/*---------------------------------------------------------------------*/
+
+CREATE TRIGGER fk_P
+AFTER INSERT ON Pelicula
+FOR EACH ROW
+WHEN (NOT existe_UID_MEDIO(NEW.UID_MEDIO))
+EXECUTE FUNCTION Mensaje_Error_FK();
+
+CREATE TRIGGER Ganancia_Costo
+  after INSERT ON Pelicula
+  FOR EACH ROW
+  WHEN (NEW.Coste_produccion < NEW.Ganancia)
+EXECUTE FUNCTION Costo();
+
+CREATE TRIGGER fk_VJ
+AFTER INSERT ON Video_juego
+FOR EACH ROW
+WHEN (NOT existe_UID_MEDIO(NEW.UID_MEDIO))
+EXECUTE FUNCTION Mensaje_Error_FK();
+
+CREATE TRIGGER fk_S
+AFTER INSERT ON Serie
+FOR EACH ROW
+WHEN (NOT existe_UID_MEDIO(NEW.UID_MEDIO))
+EXECUTE FUNCTION Mensaje_Error_FK();
+
+CREATE TRIGGER fk_H
+AFTER INSERT ON Heroe
+FOR EACH ROW
+WHEN (NOT existe_ID_Personaje(NEW.ID_Personaje))
+EXECUTE FUNCTION Personaje_Mensaje_Error_FK();
+
+CREATE TRIGGER fk_V
+AFTER INSERT ON Villano
+FOR EACH ROW
+WHEN (NOT existe_ID_Personaje(NEW.ID_Personaje))
+EXECUTE FUNCTION Personaje_Mensaje_Error_FK();
+  
+create trigger CK_Persona
+before insert on persona
+for each row
+	when ((new.Tipo_Creador_Serie=false and new.Tipo_Director=false and new.Tipo_Creador_Personaje=false and new.Tipo_Actor=false))
+		EXECUTE FUNCTION CK_Persona_Mensaje();
+
+CREATE TRIGGER CK_Pais
+BEFORE INSERT ON pais
+FOR EACH ROW 
+WHEN ( new.continente != 'AS' AND new.continente != 'AM' AND new.continente != 'OC' AND new.continente != 'EU' AND new.continente != 'AN')
+   EXECUTE FUNCTION CK_Pais();
+   	
+CREATE TRIGGER CK_Medio
+BEFORE INSERT ON Medio
+FOR EACH ROW 
+WHEN ( new.Tipo_Medio != 'S' AND new.Tipo_Medio != 'V' AND new.Tipo_Medio != 'P')
+   EXECUTE FUNCTION CK_Medio();
+  
+CREATE TRIGGER trigger_ck_personaje
+BEFORE INSERT ON Personaje
+FOR EACH ROW 
+EXECUTE FUNCTION CK_Personaje();
+
+CREATE TRIGGER fk_Premio
+AFTER INSERT ON premio
+FOR EACH ROW
+WHEN (NOT existe_ID_medio_premio (NEW.UID_Medio))
+EXECUTE FUNCTION Prmio_Mensaje_Error_FK();
+
+CREATE TRIGGER Validacion_Aparicion
+BEFORE INSERT ON Aparicion_organizacion
+FOR EACH ROW 
+EXECUTE FUNCTION Validacion_Aparicion();
+
+CREATE TRIGGER Validacion_usuario
+BEFORE INSERT ON usuario
+FOR EACH ROW 
+EXECUTE FUNCTION Validacion_usario();
+
+CREATE TRIGGER Validacion_Perfil
+BEFORE INSERT ON Perfil
+FOR EACH ROW 
+EXECUTE FUNCTION Validacion_Perfil();
+
+CREATE TRIGGER Validacion_Vio_Agrado
+BEFORE INSERT ON Vio_Agrado
+FOR EACH ROW 
+EXECUTE FUNCTION Validacion_Vio_Agrado();
+
+CREATE TRIGGER Validacion_Membresia
+BEFORE INSERT ON Membresia
+FOR EACH ROW 
+EXECUTE FUNCTION Validacion_Membresia();
+
+/*---------------------------------------------------------------------*/
+/*                           Fin de trigger                            */
+/*---------------------------------------------------------------------*/
+/*                            indices                                  */
+/*---------------------------------------------------------------------*/
+/*             Comienzo de los indices de los reportes                 */
+/*---------------------------------------------------------------------*/
+
+create index bucar_personaje on personaje(ID_Personaje);
+
+create index id_villano on villano (id_personaje);
+CREATE INDEX No_soy_batman on villano (nombre_heroe);
+
+create index id_heroe on heroe (id_personaje);
+CREATE INDEx SOY_BATMAN  ON Heroe (nombre_heroe);
+
+
+CREATE INDEX buscar_organizacion ON organizacion (uid_organizacion);
+create index buscar_nombre_organizacion on organizacion (nombre);
+
+CREATE INDEX buscar_organizacion_lista_cargo ON lista_cargo (uid_organizacion);
+create index id_personaje_lista_cargo on lista_cargo (id_personaje);
+create index buscar_cargo on lista_cargo (cargo);
+
+
+CREATE INDEX buscar_usuario ON usuario (usuario);
+
+CREATE INDEX Buscar_membresia ON membresia (tarifa);
+CREATE INDEX buscar_tipo_membresia on membresia (tipo_membresia);
+
+CREATE INDEX buscar_perfil ON perfil (uid_perfil);
+
+create index buscar_lista_poder on lista_poder ( id_personaje);
+create index buscar_poder on lista_poder (tipo_poder);
+
+CREATE INDEX idx_usuario_uid_pais ON Usuario (UID_Pais);
+CREATE INDEX idx_pais_nombre ON Pais (Nombre);
+
+/*---------------------------------------------------------------------*/
+/*                         Fin de indices                              */
+/*---------------------------------------------------------------------*/
+/*                          Inserciones                                */
+/*---------------------------------------------------------------------*/
+
+INSERT INTO Color ( Nombre)VALUES
+('Negro'),('Blanco'),('Rojo'),('Verde'),('Amarillo'),
+('Azul'),('Naranja'), ('Marron'),('Gris'),
+('Morado'),('Plateado'),('Dorado'),('Rosa'),('Magenta');
+
+INSERT INTO Objeto (Nombre, Material_Fabricacion, Tipo_Obj, Descripcion)
+VALUES
+('Mjolnir','Uru','Martillo','Odín, jefe de los dioses nórdicos, ordenó a los enanos a forjar Mjolnir. Los herreros Eitri, Brok y Buri utilizaron el núcleo de una estrella como molde.'),
+('Escudo del Capitán América','Vibranium','Escudo','Tiene un diseño de estrella de cinco puntas en su centro, dentro de círculos concéntricos azules, rojos y blancos.'),
+('Teseracto','Gema del espacio','Cubo','El Teseracto fue un cubo que contenía una Gema del Infinito, que representa la estructura del espacio. Si se usa correctamente, el Teseracto podía abrir portales a cualquier parte del universo y proporcionar un viaje interdimensional.');
+
+INSERT INTO Ocupacion (Nombre)
+VALUES 
+('Militar'), ('Dios'), ('Fotografo'), ('Actor'), ('Periodista'),
+('Cientifico'), ('Doctor'), ('Rey'), ('Empresario');
+
+
+INSERT INTO Organizacion (Nombre, Eslogan, Tipo_Org, Objetivo_principal, Primera_aparicion)
+VALUES
+('SHIELD','El principio sobre el que se fundó S.H.I.E.L.D. era puro. Proteccion.','contraterrorismo e inteligencia','la seguridad, la protección y el mantenimiento de la paz en todas las naciones y de todas las gentes alrededor del mundo.','1995/05/04'),
+('Vengadores','Vengadores, reuníos','equipo central de superhéroes',' proteger la Tierra de las amenazas internacionales o alienígenas','1963/07/02'),
+('HYDRA','Hail HYDRA','autoritaria terrorista-penal-paramilitar','dominación mundial','1995/05/04');
+
+INSERT INTO Nacionalidad(Nombre_Nacionalidad)
+VALUES
+('Americano'),('Ingles'),('Aleman'),('Ruso'),('Asgarniano');
+
+
+
+INSERT INTO Plataforma (Nombre)
+VALUES
+('XBOX'),('PLAYSTATION'),('PC'),('NINTENDO SWITCH'),('MOVIL');
+
+INSERT INTO Pais(Nombre,Continente)
+VALUES 
+('Estados Unidos','AM'), ('Venezuela','AM'), ('Italia','EU'), ('Canada','AM'), ('Japon','AM');
+
+
+
+INSERT INTO Estado (Nombre,UID_Pais)
+VALUES
+('California',1), ('Nueva York',1), ('Caracas',2), ('Merida',2),('Roma',3), 
+('Napoles',3), ('Toronto',4), ('Ottawa',4), ('Tokio',5), ('Okinawa',5);
+
+INSERT INTO Ciudad(Nombre,UID_Estado,UID_Pais)
+vALUES 
+('Los Angeles',1,1), ('Manhattan',2,1), ('Los Teques',3,2), ('Merida',4,2), ('Ciudad de Vaticano',5,3),
+('Pozzuoli',6,3), ('Dufferin',7,4), ('Upper Town',8,4), ('Minato',9,5), ('Kunigami',10,5);
+
+INSERT INTO Sector (UID_Sector, Nombre, UID_Ciudad, UID_Estado, UID_Pais)
+VALUES (1,'Manhattan',2,2,1),
+       (2,'New York',1,1,1),
+       (3,'Atlanta',8,8,4);
+
+INSERT INTO Personaje (Primer_Nombre, Segundo_Nombre, Primer_Apellido, Segundo_Apellido, Genero, Est_Civil, Primera_Aparicion, Frase_Celebre, Tipo_Personaje, UID_Color_Pelo, UID_Color_Ojos)
+VALUES 
+('Peter', 'Benjamin', 'Parker', NULL, 'M', 'SO', '1962-08-01', '¡Un gran poder conlleva una gran responsabilidad!', 'H', 1, 2),
+('Anthony', 'Edward', 'Stark', NULL, 'M', 'SE', '1963-03-01', 'Genio, multimillonario, playboy, filántropo.', 'H', 2, 1),
+('Steven', 'Grant', 'Rogers', NULL, 'M', 'SE', '1941-03-01', '¡Vengadores, reuníos!', 'H', 3, 3),
+('Victor', NULL, 'von Doom', NULL, 'M', 'SO', '1962-07-10', '¡Incluso los dioses deben temblar ante el Doctor Doom!', 'V', 4, 4),
+('Loki', NULL, 'Laufeyson', NULL, 'M', 'SO', '1949-08-01', '¡La astucia y el engaño son mis armas!', 'H', 2, 3),
+('Johann', NULL, 'Schmidt', NULL, 'M', 'SO', '1965-01-01', 'Hail Hydra!', 'V', 1, 2),
+('Virginia', NULL, 'Potts', NULL, 'F', 'CA', '2009-01-01', 'Por supuesto que soy una bomba. Soy la bomba que hace que todo funcione.', 'C', 2, 4),
+('May', NULL, 'Parker', NULL, 'F', 'VI', '1962-08-10', 'Con grandes poderes vienen grandes responsabilidades.', 'C', 5, 3),
+('Sharon', NULL, 'Carter', NULL, 'F', 'SO', '1966-05-01', 'Tu tía era bastante lista. ¿Te enseñó a boxear?', 'C', 1, 3),
+('Odín', NULL, 'Borson',NULL, 'M', 'CA', '1962-08-01', 'Odín es mi nombre. Sacrificio mi vida por mi pueblo.', 'C', 2, 3),
+('Howard', NULL, 'Stark', NULL, 'M', 'CA', '1963-05-01', 'Todo lo que construyo es para la próxima generación.', 'C', 1, 2),
+('Thor', NULL, 'Odinson', NULL,'M', 'SO', '1962-08-01', 'Por Asgard', 'H', 5, 3),
+('Norman', NULL, 'Osborn', NULL, 'M', 'DI', '1964-03-01', 'No es un disfraz. Es un uniforme.', 'V', 4, 3),
+('Obadiah', NULL, 'Stane', NULL, 'M', 'SO', '1979-01-01', 'El negocio sucio siempre paga.', 'V', 5, 4);
+INSERT INTO Villano (ID_Personaje, Nombre_Heroe, Objetivo)
+VALUES 
+(4, 'Doctor Doom', 'Conquistar el mundo'),
+(5, 'Loki', 'Gobernar Asgard'),
+(6, 'Red Skull', 'Dominar el mundo en nombre de Hydra'),
+(13,'Green Goblin','Derrotar a Spiderman y controlar la ciudad de Nueva York'),
+(14,'Iron Monger','Destruir a Tony Stark y apoderarse de su tecnología');
+
+INSERT INTO Heroe (ID_Personaje, Nombre_Heroe, Logotipo,ID_Personaje_Archienemigo)
+VALUES 
+(1, 'Spider-Man', 'https://upload.wikimedia.org/wikipedia/commons/thumb/2/21/Spider-Man_logo.svg/1200px-Spider-Man_logo.svg.png',13),
+(2, 'Iron Man', 'https://upload.wikimedia.org/wikipedia/commons/thumb/7/70/Iron_Man_logo.svg/1200px-Iron_Man_logo.svg.png',14),
+(3, 'Capitán América', 'https://upload.wikimedia.org/wikipedia/commons/thumb/3/35/Captain_America_Shield_logo.svg/1200px-Captain_America_Shield_logo.svg.png',6),
+(12, 'Thor', 'https://upload.wikimedia.org/wikipedia/commons/thumb/4/41/Thor_logo.svg/1200px-Thor_logo.svg.png',5);
+
+INSERT INTO Relacion (ID_Personaje_uno, ID_Personaje_dos, Tipo_Relacion) 
+VALUES 
+(2, 7, 'Interés amoroso'),
+(3, 9, 'Sobrina y tío'),
+(1, 8, 'Familiar'),
+(2, 10, 'Familiar'),
+(2, 11, 'Familiar');
+
+INSERT INTO Poder (Nombre, Descripcion)
+VALUES 
+('Sentido arácnido', 'Habilidad para percibir peligros antes de que ocurran.'),
+('Tecnopatía', 'Capacidad de controlar y comunicarse con la tecnología.'),
+('Ilusiones', 'Capacidad de crear ilusiones que engañan a la mente de los demás.'),
+('Super Fuerza','Brinda al portador una fuerza fisica mucho mayor a la media'),
+('Resistencia', 'El usuario cuenta con una habilidad para resistir fuerzas letales'), 
+('Volar','La persona puede elevarrse y mantenerse por encima del suelo por un tiempo prolongado');
+
+
+
+INSERT INTO Medio (Fecha_Estreno, Compañia, Titulo, Sinopsis, Saga, Tipo_Medio)
+VALUES 
+('2023-09-01', 'Insomniac Games', 'Spider-Man 2', 'Peter Parker y Miles Morales se enfrentan a un nuevo villano en la ciudad de Nueva York', 'Spider-Man', 'V'),
+('2024-03-01', 'Crystal Dynamics', 'Marvels Avengers 2: Capitán América', 'Steve Rogers lidera a los Vengadores en una nueva aventura para proteger al mundo', 'Marvels Avengers', 'V'),
+('2023-10-01', 'Marvel Studios', 'Ironheart', 'La estudiante Riri Williams construye su propia versión del traje de Iron Man y se convierte en una heroína', 'Iron Man', 'S'),
+('2024-09-01', 'Marvel Studios', 'The Falcon and The Winter Soldier', 'Sam Wilson y Bucky Barnes se unen para luchar contra una nueva amenaza', 'Captain America', 'S'),
+('2023-07-01', 'Marvel Studios', 'Spiderman: Sin camino a casa', 'Peter Parker lucha contra sus enemigos en una batalla multidimensional', 'Spiderman', 'P'),
+('2017-11-03', 'Marvel Studios', 'Thor: Ragnarok', 'Thor debe luchar en una competencia alienígena para evitar el fin del mundo', 'Thor', 'P');
+
+
+INSERT INTO Video_juego (UID_Medio, Tipo_Juego, Publicadora)
+VALUES 
+(1, 'Acción y aventura', 'Sony Interactive Entertainment'),
+(2, 'Rol de acción', 'Square Enix');
+
+
+INSERT INTO Serie (UID_Medio, Total_Cap, Canal_Transmitido, Tipo_Serie)
+VALUES 
+(3, 10, 'Disney+', 'Drama y acción'),
+(4, 6, 'Disney+', 'Acción y aventura');
+
+INSERT INTO Pelicula (UID_Medio, Duracion, Distribuidor, Coste_produccion, Ganancia, Tipo_Pelicula)
+VALUES 
+(4, 140, 'Sony Pictures', 200000000, 1000000000, 'Acción y aventura'),
+(6, 131, 'Walt Disney Studios Motion Pictures', 180000000, 853977126, 'Acción y comedia');
+
+INSERT INTO Premio (Nombre_Premio, UID_Medio)
+VALUES 
+('Mejor juego de aventura', 1),
+('Mejor juego de rol', 2);
+
+INSERT INTO Persona (Primer_Nombre, Segundo_Nombre, Primer_Apellido, Segundo_Apellido, Tipo_Creador_Serie, Tipo_Director, Tipo_Creador_Personaje, Tipo_Actor)
+VALUES ('Malcolm', NULL, 'Spellman', NULL, TRUE, FALSE, FALSE, FALSE),
+       ('Chinaka', NULL, 'Hodge', NULL, TRUE, FALSE, FALSE, FALSE),
+       ('Jon', NULL, 'Watts', NULL, FALSE, TRUE, FALSE, FALSE),
+       ('Taika', NULL, 'Waititi', NULL, FALSE, TRUE, FALSE, FALSE),
+       ('Joe', NULL, 'Simon', NULL, FALSE, FALSE, TRUE, FALSE),
+       ('Stan', NULL, 'Lee', 'Lieber', FALSE, FALSE, TRUE, FALSE),
+       ('Tom', NULL, 'Holland', NULL, FALSE, FALSE, FALSE, TRUE),
+       ('Shameik', NULL, 'Moore', NULL, FALSE, FALSE, FALSE, TRUE);
+
+INSERT INTO Sede (Nombre, Tipo_edif, Sede_Origen, UID_Sector, UID_Ciudad, UID_Estado, UID_Pais, UID_Organizacion)
+VALUES('Torre Avengers', 'Rascacielos', TRUE, 1,2,2,1,2),
+      ('Helicarrier', 'Aeronave', TRUE, 2,1,1,1,1),
+      ('Base Hydra', 'Bunker', TRUE, 3,8,8,4,3);
+	  
+INSERT INTO Usuario (Usuario, Correo_Electronico, Primer_Nombre, Segundo_Nombre, Primer_Apellido, Segundo_Apellido, Contrasena, Fecha_Nacimiento, Genero, Nro_Tarjeta, UID_Pais) 
+VALUES ('usuario1', 'usuario1@gmail.com', 'Juan', 'Pablo', 'Perez', 'Gonzalez', 'contrasena1', '1990-01-01', 'M', '12345678901233',1),
+       ('usuario2', 'usuario2@hotmail.com', 'Maria', NULL, 'Gonzalez', 'Perez', 'contrasena2', '1995-02-02', 'F', '1234567890123457',1),
+       ('usuario3', 'usuario3@Outlook.com', 'Pedro', NULL, 'Perez', NULL, 'contrasena3', '2000-03-03', 'D', '1234567890123458',2),
+       ('usuario4', 'usuario4@gmail.com', 'Luisa', NULL, 'Garcia', NULL, 'contrasena4', '1995-04-04', 'F', '1234567890123459',2),
+       ('usuario5', 'usuario5@hotmail.com', 'Carlos', NULL, 'Gonzalez', NULL, 'contrasena5', '2000-05-05', 'M', '1234567890123460',3),
+       ('usuario6', 'usuario6@Outlook.com', 'Ana Maria','Isabel','Perez','Garcia','contrasena6','1995-06-06','F','1234567890123461',3),
+       ('usuario7','usuario7@gmail.com','Jose Luis','Antonio','Garcia','Perez','contrasena7','2000-07-07','M','1234567890123462',4),
+       ('usuario8','usuario8@hotmail.com','Maria Josefa','Luisa','Perez','Garcia','contrasena8','1995-08-08','F','1234567890123463',4),
+       ('usuario9','usuario9@Outlook.com','Juan Carlos','','Gonzalez','','contrasena9','2000-09-09','M','1234567890123464',5),
+       ('usuario10','usuario10@gmail.com','','','','Garcia Perez','contrasena10','1995-10-10','O','1234567890123465',5),
+	   ('usuario11','usuario11@gmail.com','','','','Garcia Perez','contrasena10','1995-10-10','O','1234567890123465',5);
+
+INSERT INTO Perfil (Nombre, Correo_Notificacion, Usuario) 
+VALUES ('Juan Perez', 'juanperez@gmail.com', 'usuario1'),
+       ('Maria Gonzalez', NULL, 'usuario2'),
+       ('Pedro Perez', NULL, 'usuario3'),
+       ('Luisa Garcia', NULL, 'usuario4'),
+       ('Carlos Gonzalez', NULL, 'usuario5'),
+       ('Jose Luis Garcia Perez','joseluisgarcia@hotmail.com','usuario7'),
+       ('Maria Josefa Perez Garcia','mariajosefaperez@hotmail.com','usuario8'),
+       ('Juan Carlos Gonzalez','juancarlos@gmail.com','usuario9'),
+       ('Juan Pablo Perez Gonzalez','juanpabloperezgonzalez@gmail.com','usuario1'),
+       ('Maria Isabel Gonzalez Perez','mariaisabelgonzalezperez@hotmail.com','usuario2'),
+       ('Pedro Jose Perez Gonzalez','pedrojoseperezgonzalez@Outlook.com','usuario3'),
+       ('Luisa Maria Garcia Perez','luisamariagarcia@hotmail.com','usuario4'),
+       ('Carlos Andres Gonzalez Perez','carlosandresgonzalezperez@gmail.com','usuario5'),
+       ('Jose Luis Antonio Garcia Perez','joseluisantoniogarciaperez@gmail.com','usuario7'),
+       ('Maria Josefa Luisa Perez Garcia','mariajosefaluisaperezgarcia@hotmail.com','usuario8'),
+       ('Juan Carlos Gonzalo Gonzalez','juancarlos.gonzalo@gmail.com','usuario9');
+
+
+
+INSERT INTO Membresia (Fecha_fin, Fecha_inicio, Tipo_Membresia, Tarifa, Descripcion, Usuario) 
+VALUES 
+	('2023-12-31', '2023-01-01', 'F', 0.0, 'Membresía free', 'usuario1'),
+       (NULL, '2023-01-01', 'G', 4.99, 'Membresía de oro', 'usuario2'),
+       (NULL, '2023-01-01', 'P', 9.99, 'Membresía platino', 'usuario3'),
+       (NULL, '2023-01-01', 'V', 14.99, 'Membresía VIP', 'usuario4'),
+       (NULL, '2023-01-01', 'F', 0.0, 'Membresía free', 'usuario5'),
+       (NULL, '2023-01-01', 'G', 4.99, 'Membresía de oro', 'usuario6'),
+       ('2023-12-31','2023-01-01','P',9.99,'Membresía platino','usuario7'),
+       ('2023-12-31','2023-01-01','V',14.99,'Membresía VIP','usuario8'),
+       ('2023-12-31','2023-01-01','F',0.0,'Membresía free','usuario9'),
+       (NULL,'2023-01-01','G',4.99,'Membresía de oro','usuario10'),
+       (NULL,'2023-01-01','P',9.99,'Membresía platino','usuario1'),
+       (NULL,'2023-01-01','V',14.99,'Membresía VIP','usuario2'),
+       (NULL,'2023-01-01','F',0.0,'Membresía free','usuario3'),
+       (NULL,'2023-01-01','G',4.99,'Membresía de oro','usuario4'),
+       (NULL,'2023-01-01','P',9.99,'Membresía platino','usuario5'),
+	   (NULL,'2023-01-01','P',9.99,'Membresía platino','usuario11');
+
+INSERT INTO Vio_Agrado (Fecha_Visualizacion, Critica, Calificacion, Hora_fin, UID_Medio, UID_Perfil, Usuario)
+VALUES ('2022-05-15 16:30:00', 'Excelente película, la trama y los efectos especiales son impresionantes', 5, '2022-05-15 19:00:00', 5, 1, 'usuario1'),
+       ('2022-06-01 20:00:00', 'La película es entretenida pero no cumple con las expectativas', 3, '2022-06-01 22:30:00', 5, 2, 'usuario2'),
+       ('2022-07-10 14:00:00', NULL, 4, '2022-07-10 16:30:00', 6, 3, 'usuario3'),
+       ('2022-08-20 18:00:00', 'La película tiene una trama interesante pero los efectos especiales no son muy buenos', 2, '2022-08-20 20:30:00', 6, 4, 'usuario4'),
+       ('2022-09-05 22:00:00', 'La película es muy aburrida, no la recomiendo', 1, '2022-09-06 00:30:00', 5, 5, 'usuario5');
+
+INSERT INTO Traje (UID_Traje, UID_Color, ID_Personaje)
+VALUES (1, 3, 1),
+       (2, 1, 2),
+       (3, 5, 3),
+       (4, 10, 12),
+       (5, 7, 1);
+
+INSERT INTO Lista_Creador (UID_Medio, UID_Persona)
+VALUES (3,2), (4,1);
+
+INSERT INTO Lista_Director (UID_Medio, UID_Persona)
+VALUES (4,3), (6,4);
+
+INSERT INTO Escritor (UID_Persona,ID_Personaje)
+VALUES (5,6),(5,3),(6,12),(6,1);
+
+INSERT INTO Reparto (UID_Persona, UID_Medio, ID_Personaje, Tipo_papel, Tipo_actor)
+VALUES (7,5,1,'P','I'), (8,5,1,'P','V');
+
+INSERT INTO Lista_Plataforma (UID_Medio, UID_Plataforma)
+VALUES (1,2), (1,3), (2,3);
+
+INSERT INTO Lista_Cargo (UID_Organizacion, ID_Personaje, Cargo)
+VALUES 
+(2, 1, 'Miembro'),
+(2, 2, 'Miembro'),
+(2, 3, 'Líder'),
+(3, 6, 'Líder'),
+(1, 9, 'Agente');
+
+INSERT INTO Lista_Objeto (ID_Personaje, UID_Objeto)
+VALUES 
+(3, 2),
+(6, 3),
+(12, 1);
+
+INSERT INTO Lista_Creador_Obj (ID_Personaje, UID_Objeto)
+VALUES 
+(8, 1),
+(3, 2);
+
+INSERT INTO Lista_Poder (UID_Poder, ID_Personaje, Tipo_Poder)
+VALUES (1, 1, 'H'), (2, 4, 'A'), (3, 5, 'A'), (4, 3, 'A'), (5, 6, 'A');
+
+INSERT INTO Lista_Medio (UID_Medio, UID_Personaje)
+VALUES (1,1), (2,3), (5,1), (6,12);
+
+
+INSERT INTO Lista_Nacionalidad (UID_Nacionalidad,ID_Personaje,Principal)
+VALUES (1,1,TRUE),(1,2,TRUE),(1,3,TRUE),(5,12,TRUE);
+
+INSERT INTO Lista_Gusto (UID_Perfil,Usuario,UID_Medio)
+VALUES (1, 'usuario3',1), (2, 'usuario2',2), (1, 'usuario1',3);
+
+INSERT INTO Combate (Fecha,UID_Sector,UID_Ciudad,UID_Estado,UID_Pais)
+VALUES ('2022-05-15',1,2,2,1), ('2020-07-18',2,1,1,1), ('2021-02-13',3,8,8,4);
+
+INSERT INTO Participante (UID_Combate,ID_Personaje)
+VALUES (1,2), (1,14), (2,3), (2,6), (3,1), (3,13);
+
+INSERT INTO Lista_Poder_Participante (UID_Combate,ID_Personaje,UID_Poder)
+VALUES (2,3,4), (2,3,5), (2,6,4), (2,6,5), (3,1,1), (3,13,5);
+
+INSERT INTO Lista_Objeto_Combate (UID_Combate,UID_Obj)
+VALUES (2,2), (1,3), (3,1);
+
+INSERT INTO Ejerce (UID_Ocupacion, ID_Personaje)
+VALUES (3,1), (2,12), (1,3), (9,2);
+
+INSERT INTO Aparicion_Organizacion (UID_Medio, UID_Organizacion, Protagonismo, Estado)
+VALUES (1, 2, 'P', 'Activa'),
+       (2, 1, 'S', 'Disuelta'),
+       (3, 3, 'A', 'Activa'),
+       (5, 2, 'P', 'Activa');
+	   
+INSERT INTO Restriccion (UID_Pais,UID_Medio)
+VALUES (5,2), (4,1), (2,4);
+
+/*---------------------------------------------------------------------*/
+/*                         Fin de inserciones                          */
+/*---------------------------------------------------------------------*/
+/*                        inserciones erroneas                          */
+/*---------------------------------------------------------------------*/
+
+-- Validacion del trigger de rating---
+
+INSERT INTO Vio_Agrado (Fecha_Visualizacion, Critica, Calificacion, Hora_fin, UID_Medio, UID_Perfil, Usuario)
+VALUES ('2023-06-01 00:00:00', 'Buena película', 6, '2023-06-15 23:59:59', 1, 1, 'juanperez');
+INSERT INTO Vio_Agrado (Fecha_Visualizacion, Critica, Calificacion, Hora_fin, UID_Medio, UID_Perfil, Usuario)
+VALUES ('2023-06-15 23:59:59', 'Buena película', 6, '2023-06-01 00:00:00', 1, 1, 'juanperez');
+
+---- validacion trigger
+
+--   Validacion costo de rating
+
+INSERT INTO Pelicula (UID_Medio, Duracion, Distribuidor, Coste_produccion, Ganancia, Tipo_Pelicula)
+VALUES 
+(5, 131, 'Walt Disney Studios Motion Pictures', 180000000, 853977126, 'Acción y comedia');
+
+--INICIO DE trigger para quer te de mensajes personalizados, al parecer no fue solicitado me confundi y lo realice, para la siguiente entrega seran eliminados
+
+
+
+INSERT INTO Pais (Nombre, Continente) VALUES ('Argentina', 'SA');
+
+INSERT INTO Persona (Primer_Nombre, Primer_Apellido, Tipo_Creador_Serie, Tipo_Director, Tipo_Creador_Personaje, Tipo_Actor) VALUES ('Juan', 'Pérez', false, false, false, false);
+
+INSERT INTO Medio (Fecha_Estreno, Compañia, Titulo, Sinopsis, Saga, Tipo_Medio) VALUES ('2023-06-12', 'Compañía X', 'Título Y', 'Sinopsis Z', 'Saga A', 'Q');
+
+INSERT INTO Personaje (Primer_Nombre, Segundo_Nombre, Primer_Apellido, Segundo_Apellido, Genero, Est_Civil, Primera_Aparicion, Frase_Celebre, Tipo_Personaje, UID_Color_Pelo, UID_Color_Ojos) VALUES ('Catalina', 'Maria', 'Lopez', 'Hernandez', 'F', 'SO', '2005-03-23', '¡Yo soy la reina!', 'A', 1, 2);
+INSERT INTO Personaje (Primer_Nombre, Segundo_Nombre, Primer_Apellido, Segundo_Apellido, Genero, Est_Civil, Primera_Aparicion, Frase_Celebre, Tipo_Personaje, UID_Color_Pelo, UID_Color_Ojos) VALUES ('Juan', 'Pablo', 'García', 'Pérez', 'X', 'SO', '2000-07-12', '¡Hola mundo!', 'H', 3, 4);
+INSERT INTO Personaje (Primer_Nombre, Segundo_Nombre, Primer_Apellido, Segundo_Apellido, Genero, Est_Civil, Primera_Aparicion, Frase_Celebre, Tipo_Personaje, UID_Color_Pelo, UID_Color_Ojos) VALUES ('Ana', 'Luz', 'Pérez', 'González', 'F', 'OT', '1999-05-01', '¡Hola a todos!', 'V', 2, 1);
+
+INSERT INTO Medio (Fecha_Estreno, Compañia, Titulo, Sinopsis, Saga, Tipo_Medio) VALUES ('2021-05-20', 'Disney', 'Loki', 'Serie de televisión de Disney+ sobre el personaje de Marvel Comics', 'Universo Cinematográfico de Marvel', 'X');
+INSERT INTO Medio (Fecha_Estreno, Compañia, Titulo, Sinopsis, Saga, Tipo_Medio) VALUES ('2019-11-22', 'Sony Pictures', 'Frozen 2', 'Película animada de Disney', NULL, 'A');
+
+
+INSERT INTO Estado (UID_Estado, Nombre, UID_Pais) VALUES (1, 'Estado A', 1);
+INSERT INTO Estado (UID_Estado, Nombre, UID_Pais) VALUES (1, 'Estado B', 1);
+
+INSERT INTO Ciudad (UID_Ciudad, Nombre, UID_Estado, UID_Pais) VALUES (1, 'Ciudad A', 10, 1);
+
+INSERT INTO Ciudad (UID_Ciudad, Nombre, UID_Estado, UID_Pais) VALUES (1, 'Ciudad A', 1, 1);
+INSERT INTO Ciudad (UID_Ciudad, Nombre, UID_Estado, UID_Pais) VALUES (1, 'Ciudad B', 1, 99);
+
+INSERT INTO Sector (UID_Sector, Nombre, UID_Ciudad, UID_Estado, UID_Pais) VALUES 
+(1, 'Sector A', 1, 10, 1);
+
+INSERT INTO Sector (UID_Sector, Nombre, UID_Ciudad, UID_Estado, UID_Pais) VALUES (1, 'Sector B', 1, 1, 1);
+
+INSERT INTO Personaje (Primer_Nombre, Primer_Apellido, Genero, Est_Civil, Primera_Aparicion, Frase_Celebre, Tipo_Personaje, UID_Color_Pelo, UID_Color_Ojos)
+VALUES ('John', 'Doe', 'M', 'SO', '2000-01-01', '¡Hola mundo!', 'X', 1, 2);
+INSERT INTO Personaje (Primer_Nombre, Primer_Apellido, Genero, Est_Civil, Primera_Aparicion, Frase_Celebre, Tipo_Personaje, UID_Color_Pelo, UID_Color_Ojos)
+VALUES ('Jane', 'Doe', 'X', 'SO', '2000-01-01', '¡Hola mundo!', 'H', 1, 2);
+INSERT INTO Personaje (Primer_Nombre, Primer_Apellido, Genero, Est_Civil, Primera_Aparicion, Frase_Celebre, Tipo_Personaje, UID_Color_Pelo, UID_Color_Ojos)
+VALUES ('John', 'Doe', 'M', 'X', '2000-01-01', '¡Hola mundo!', 'H', 1, 2);
+
+INSERT INTO Heroe (ID_Personaje, Nombre_Heroe, Logotipo, ID_Personaje_Archienemigo)
+VALUES (1, 'Superman', 'logo.png', 999);
+
+INSERT INTO Video_juego (UID_Medio, Tipo_Juego, Publicadora) VALUES (999, 'Aventura', 'Publicadora A');
+
+INSERT INTO Pelicula (UID_Medio, Duracion, Distribuidor, Coste_produccion, Ganancia, Tipo_Pelicula)
+VALUES (1, 90, 'Distribuidor A', -1000, 5000, 'Comedia');
+
+INSERT INTO Video_juego (UID_Medio, Tipo_Juego, Publicadora) VALUES (1, 'Aventura', 'Publicadora A');
+
+INSERT INTO Premio (Nombre_Premio, UID_Medio) VALUES ('Mejor Juego del Año', 999);
+
+INSERT INTO Usuario (Usuario, Correo_Electronico, Primer_Nombre, Primer_Apellido, Contrasena, Fecha_Nacimiento, Genero, Nro_Tarjeta, UID_Pais)
+VALUES ('johndoe', 'johndoe.com', 'John', 'Doe', 'contrasena', '1990-01-01', 'M', '1234567890123456', 1);
+INSERT INTO Usuario (Usuario, Correo_Electronico, Primer_Nombre, Primer_Apellido, Contrasena, Fecha_Nacimiento, Genero, Nro_Tarjeta, UID_Pais)
+VALUES ('janedoe', 'janedoe@gmail.com', 'Jane', 'Doe', 'contrasena', '1990-01-01', 'F', 'abc', 1);
+
+INSERT INTO Perfil (Nombre, Correo_Notificacion, Usuario) VALUES ('Juan Perez', 'juanperez.com', 'juanperez');
+
+INSERT INTO Vio_Agrado (Fecha_Visualizacion, Critica, Calificacion, Hora_ini, Hora_fin, UID_Medio, UID_Perfil, Usuario)
+VALUES ('2022-01-01', 'Buena película', 6, '12:00:00', '14:00:00', 1, 1, 'juanperez');
+
+INSERT INTO Membresia (Fecha_fin, Fecha_inicio, Tipo_Membresia, Tarifa, Descripcion, Usuario)
+VALUES ('2023-01-01', '2022-01-01', 'F', 3.99, 'Membresía anual', 'juanperez');
+INSERT INTO Membresia (Fecha_fin, Fecha_inicio, Tipo_Membresia, Tarifa, Descripcion, Usuario)
+VALUES ('2021-12-31', '2022-01-01', 'F', 9.99, 'Membresía anual', 'juanperez');
+
+INSERT INTO Sede (Nombre, Tipo_edif, Sede_Origen, UID_Sector, UID_Ciudad, UID_Estado, UID_Pais, UID_Organizacion)
+VALUES ('Sede principal', NULL, true, 1, 1, 1, 1, 1);
+
+INSERT INTO Reparto (UID_Persona, UID_Medio, ID_Personaje, Tipo_papel, Tipo_actor)
+VALUES (1, 1, 1, 'X', 'V');
+
+INSERT INTO Reparto (UID_Persona, UID_Medio, ID_Personaje, Tipo_papel, Tipo_actor)
+VALUES (1, 1, 1, 'P', 'X');
+
+INSERT INTO Lista_Poder (UID_Poder, ID_Personaje, Tipo_Poder)
+VALUES (1, 1, 'X');
+
+INSERT INTO Relacion (ID_Personaje_uno, ID_Personaje_dos, Tipo_Relacion)
+VALUES (1, 1, 'Padre');
+	   
+/*---------------------------------------------------------------------*/
+/*                  Fin de inserciones erroneas                        */
+/*---------------------------------------------------------------------*/
+/*                          Select                                     */
+/*---------------------------------------------------------------------*/
+
+-- Reporte uno de los solicitados
+--Cumple con todo los requisitos del primer reporte
+
+	SELECT 
+    CASE 
+        WHEN Heroe.Nombre_Heroe IS NOT NULL THEN Heroe.Nombre_Heroe 
+        ELSE Villano.Nombre_Heroe 
+    END AS "Nombre del Personaje",
+    Organizacion.Nombre AS "Nombre de la Organización"
+FROM 
+    Personaje
+    LEFT JOIN Heroe ON Personaje.ID_Personaje = Heroe.ID_Personaje
+    LEFT JOIN Villano ON Personaje.ID_Personaje = Villano.ID_Personaje
+    INNER JOIN Lista_Cargo ON Personaje.ID_Personaje = Lista_Cargo.ID_Personaje
+    INNER JOIN Organizacion ON Lista_Cargo.UID_Organizacion = Organizacion.UID_Organizacion
+    LEFT JOIN Lista_Poder ON Personaje.ID_Personaje = Lista_Poder.ID_Personaje
+WHERE 
+    Lista_Cargo.Cargo = 'Líder'
+    AND Lista_Poder.Tipo_Poder = 'A';
+	
+
+--Fin (Cumple con todo los requisitos)
+-- Fin de reporte uno
+
+-- Comienzo de consulta para saber los tres paises con mayor cantidad de usuario
+
+SELECT 
+   Pais.Nombre AS Pais,
+   COUNT(DISTINCT Usuario.Usuario) AS Cantidad
+FROM 
+   Usuario 
+   JOIN Pais ON Usuario.UID_Pais = Pais.UID_Pais
+GROUP BY 
+   Pais.Nombre
+ORDER BY 
+   Cantidad DESC
+LIMIT 3;
+
+-- Fin de la consulta de los paises con mas usuarios
