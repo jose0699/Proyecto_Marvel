@@ -4,6 +4,7 @@
  */
 
 package Vistas;
+import Controlador.Controlador_Login;
 
 /**
  *
@@ -54,6 +55,11 @@ public class Login extends javax.swing.JFrame {
         Iniciar_sesion.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
         Iniciar_sesion.setForeground(new java.awt.Color(255, 255, 255));
         Iniciar_sesion.setText("Iniciar sesión");
+        Iniciar_sesion.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                Iniciar_sesionActionPerformed(evt);
+            }
+        });
         getContentPane().add(Iniciar_sesion, new org.netbeans.lib.awtextra.AbsoluteConstraints(120, 360, 230, 45));
 
         CrearCuenta.setBackground(new java.awt.Color(46, 199, 62));
@@ -113,6 +119,11 @@ public class Login extends javax.swing.JFrame {
     private void CrearCuentaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_CrearCuentaActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_CrearCuentaActionPerformed
+
+    private void Iniciar_sesionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_Iniciar_sesionActionPerformed
+        // TODO add your handling code here:
+        
+    }//GEN-LAST:event_Iniciar_sesionActionPerformed
 
     /**
      * @param args the command line arguments
