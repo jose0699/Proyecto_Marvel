@@ -117,7 +117,7 @@ public class Registrarse_dos extends javax.swing.JFrame {
 
         Usuario.setFont(new java.awt.Font("Segoe UI", 0, 16)); // NOI18N
         Usuario.setHorizontalAlignment(javax.swing.JTextField.CENTER);
-        getContentPane().add(Usuario, new org.netbeans.lib.awtextra.AbsoluteConstraints(250, 170, 300, 40));
+        getContentPane().add(Usuario, new org.netbeans.lib.awtextra.AbsoluteConstraints(260, 170, 300, 40));
 
         Contrasena.setFont(new java.awt.Font("Segoe UI", 0, 16)); // NOI18N
         Contrasena.setHorizontalAlignment(javax.swing.JTextField.CENTER);

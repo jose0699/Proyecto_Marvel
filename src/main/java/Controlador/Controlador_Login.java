@@ -18,9 +18,9 @@ import Vistas.Cambiar_Contrasena_Usuario;
 import Vistas.Registrar;
 //Fin de interfaces a invocar
 
-//Modelos
+//Comienzzo de  Conexion
 import Modelo.ConexionBD;
-//Fin de los modelos
+//Fin de Conexion
 
 //Bibliotecas
 import java.io.IOException;
@@ -33,20 +33,24 @@ import java.util.logging.Logger;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 //Fin de bibliotecas
+
+
 /**
  *
  * @author José Luis López
  */
 public class Controlador_Login implements ActionListener {
     private Login login;
-    
-    
+    Cambiar_Contrasena_Usuario cu = new Cambiar_Contrasena_Usuario ();
+
+    ConexionBD Conexion= new ConexionBD();
     //añadir botones
     public Controlador_Login(Login login) {
         this.login = login;
         this.login.Iniciar_sesion.addActionListener(this);
         this.login.Olvido_Contrasena.addActionListener(this);
         this.login.CrearCuenta.addActionListener(this);
+        
     }
     //fin de añadir botones
     
@@ -54,31 +58,36 @@ public class Controlador_Login implements ActionListener {
     
     @Override
     public void actionPerformed(ActionEvent ae) {
-        if(ae.getSource()== login.Iniciar_sesion){ 
-           Principal pri = new Principal();
-            pri.setVisible(true);
-           login.setVisible(false);         
-        }
         
+        if(ae.getSource()== login.Iniciar_sesion){ 
+           if(login.Usuario_Login == null){
+                JOptionPane.showMessageDialog(null,"Error de campo vacio: Usuario");
+           }else {
+              if (login.Contrasena_Login==null){
+                    JOptionPane.showMessageDialog(null,"Error de campo vacio: Contraseña");
+              }else {
+                 if (Conexion.conectar()){    
+                  Principal pri = new Principal();
+                  pri.setVisible(true);
+                  login.setVisible(false);
+                }  
+              }        
+           }          
+        }  
         
         if( ae.getSource()==login.Contrasena_Login){
             Cambiar_Contrasena_Usuario cu = new Cambiar_Contrasena_Usuario ();
             cu.setVisible(true);
             login.setVisible(false);
         } 
+     
         
      if(ae.getSource()== login.CrearCuenta){ 
          Registrar re = new Registrar();
          re.setVisible(true);
          login.setVisible(false);
-     }
-     
-     
-     
-     
-     
+     }   
 }
-
 }
     
 

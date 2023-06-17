@@ -34,12 +34,20 @@ public class Registrar extends javax.swing.JFrame {
         Segundo_Apellido = new javax.swing.JTextField();
         Segundo_Nombre = new javax.swing.JTextField();
         Genero = new javax.swing.JComboBox<>();
+        jComboBox1 = new javax.swing.JComboBox<>();
+        Dia = new javax.swing.JTextField();
+        Mes = new javax.swing.JTextField();
+        Año = new javax.swing.JTextField();
         Titulo_dos = new javax.swing.JLabel();
         jLabel1 = new javax.swing.JLabel();
         jLabel2 = new javax.swing.JLabel();
         Apellido = new javax.swing.JLabel();
         Apellido_2 = new javax.swing.JLabel();
         Genero_ = new javax.swing.JLabel();
+        F_2 = new javax.swing.JLabel();
+        Fecha = new javax.swing.JLabel();
+        Nacionalidad = new javax.swing.JLabel();
+        F_1 = new javax.swing.JLabel();
         Fondo_Registro = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
@@ -50,7 +58,7 @@ public class Registrar extends javax.swing.JFrame {
         Titulo.setForeground(new java.awt.Color(255, 255, 255));
         Titulo.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         Titulo.setText("Registrarse");
-        getContentPane().add(Titulo, new org.netbeans.lib.awtextra.AbsoluteConstraints(210, 70, 200, -1));
+        getContentPane().add(Titulo, new org.netbeans.lib.awtextra.AbsoluteConstraints(220, 60, 200, -1));
 
         Registrarse.setBackground(new java.awt.Color(50, 130, 250));
         Registrarse.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
@@ -63,54 +71,100 @@ public class Registrar extends javax.swing.JFrame {
 
         Primer_Nombre.setFont(new java.awt.Font("Segoe UI", 0, 16)); // NOI18N
         Primer_Nombre.setHorizontalAlignment(javax.swing.JTextField.CENTER);
-        getContentPane().add(Primer_Nombre, new org.netbeans.lib.awtextra.AbsoluteConstraints(170, 180, 300, 40));
+        getContentPane().add(Primer_Nombre, new org.netbeans.lib.awtextra.AbsoluteConstraints(80, 200, 230, 40));
 
         Primer_Apellido.setFont(new java.awt.Font("Segoe UI", 0, 16)); // NOI18N
         Primer_Apellido.setHorizontalAlignment(javax.swing.JTextField.CENTER);
         Primer_Apellido.setText("\n");
-        getContentPane().add(Primer_Apellido, new org.netbeans.lib.awtextra.AbsoluteConstraints(170, 350, 300, 40));
+        getContentPane().add(Primer_Apellido, new org.netbeans.lib.awtextra.AbsoluteConstraints(80, 300, 230, 40));
 
         Segundo_Apellido.setFont(new java.awt.Font("Segoe UI", 0, 16)); // NOI18N
         Segundo_Apellido.setHorizontalAlignment(javax.swing.JTextField.CENTER);
-        getContentPane().add(Segundo_Apellido, new org.netbeans.lib.awtextra.AbsoluteConstraints(170, 430, 300, 40));
+        getContentPane().add(Segundo_Apellido, new org.netbeans.lib.awtextra.AbsoluteConstraints(330, 300, 230, 40));
 
         Segundo_Nombre.setFont(new java.awt.Font("Segoe UI", 0, 16)); // NOI18N
         Segundo_Nombre.setHorizontalAlignment(javax.swing.JTextField.CENTER);
-        getContentPane().add(Segundo_Nombre, new org.netbeans.lib.awtextra.AbsoluteConstraints(170, 270, 300, 40));
+        getContentPane().add(Segundo_Nombre, new org.netbeans.lib.awtextra.AbsoluteConstraints(330, 200, 230, 40));
 
         Genero.setFont(new java.awt.Font("Segoe UI", 0, 16)); // NOI18N
         Genero.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Femenino", "Masculino", "Desconocido", "Otros" }));
-        getContentPane().add(Genero, new org.netbeans.lib.awtextra.AbsoluteConstraints(270, 500, 200, 35));
+        Genero.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                GeneroActionPerformed(evt);
+            }
+        });
+        getContentPane().add(Genero, new org.netbeans.lib.awtextra.AbsoluteConstraints(230, 490, 200, 35));
+
+        jComboBox1.setFont(new java.awt.Font("Segoe UI", 0, 16)); // NOI18N
+        jComboBox1.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Estados Unidos", "Venezuela", "Italia, ", "Canada ", "Japon" }));
+        getContentPane().add(jComboBox1, new org.netbeans.lib.awtextra.AbsoluteConstraints(330, 390, 230, 40));
+
+        Dia.setFont(new java.awt.Font("Segoe UI", 0, 16)); // NOI18N
+        Dia.setHorizontalAlignment(javax.swing.JTextField.CENTER);
+        Dia.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                DiaActionPerformed(evt);
+            }
+        });
+        getContentPane().add(Dia, new org.netbeans.lib.awtextra.AbsoluteConstraints(80, 390, 50, 40));
+
+        Mes.setFont(new java.awt.Font("Segoe UI", 0, 16)); // NOI18N
+        Mes.setHorizontalAlignment(javax.swing.JTextField.CENTER);
+        getContentPane().add(Mes, new org.netbeans.lib.awtextra.AbsoluteConstraints(160, 390, 50, 40));
+
+        Año.setFont(new java.awt.Font("Segoe UI", 0, 16)); // NOI18N
+        Año.setHorizontalAlignment(javax.swing.JTextField.CENTER);
+        getContentPane().add(Año, new org.netbeans.lib.awtextra.AbsoluteConstraints(250, 390, 50, 40));
 
         Titulo_dos.setFont(new java.awt.Font("Segoe UI", 1, 24)); // NOI18N
         Titulo_dos.setForeground(new java.awt.Color(255, 255, 255));
         Titulo_dos.setText("Información personal");
-        getContentPane().add(Titulo_dos, new org.netbeans.lib.awtextra.AbsoluteConstraints(190, 130, -1, -1));
+        getContentPane().add(Titulo_dos, new org.netbeans.lib.awtextra.AbsoluteConstraints(200, 110, -1, -1));
 
         jLabel1.setFont(new java.awt.Font("Segoe UI", 0, 16)); // NOI18N
         jLabel1.setForeground(new java.awt.Color(255, 255, 255));
         jLabel1.setText("Primer nombre *");
-        getContentPane().add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(90, 160, -1, -1));
+        getContentPane().add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(120, 160, -1, -1));
 
         jLabel2.setFont(new java.awt.Font("Segoe UI", 0, 16)); // NOI18N
         jLabel2.setForeground(new java.awt.Color(255, 255, 255));
         jLabel2.setText("Segundo nombre");
-        getContentPane().add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(90, 240, -1, -1));
+        getContentPane().add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(390, 160, -1, -1));
 
         Apellido.setFont(new java.awt.Font("Segoe UI", 0, 16)); // NOI18N
         Apellido.setForeground(new java.awt.Color(255, 255, 255));
         Apellido.setText("Primer apellido*");
-        getContentPane().add(Apellido, new org.netbeans.lib.awtextra.AbsoluteConstraints(90, 320, -1, -1));
+        getContentPane().add(Apellido, new org.netbeans.lib.awtextra.AbsoluteConstraints(140, 270, -1, -1));
 
         Apellido_2.setFont(new java.awt.Font("Segoe UI", 0, 16)); // NOI18N
         Apellido_2.setForeground(new java.awt.Color(255, 255, 255));
         Apellido_2.setText("Segundo apellido");
-        getContentPane().add(Apellido_2, new org.netbeans.lib.awtextra.AbsoluteConstraints(100, 400, -1, -1));
+        getContentPane().add(Apellido_2, new org.netbeans.lib.awtextra.AbsoluteConstraints(370, 270, -1, -1));
 
         Genero_.setFont(new java.awt.Font("Segoe UI", 0, 16)); // NOI18N
         Genero_.setForeground(new java.awt.Color(255, 255, 255));
         Genero_.setText("Genero*");
-        getContentPane().add(Genero_, new org.netbeans.lib.awtextra.AbsoluteConstraints(180, 510, -1, -1));
+        getContentPane().add(Genero_, new org.netbeans.lib.awtextra.AbsoluteConstraints(300, 450, -1, -1));
+
+        F_2.setFont(new java.awt.Font("Segoe UI", 0, 24)); // NOI18N
+        F_2.setForeground(new java.awt.Color(255, 255, 255));
+        F_2.setText("/");
+        getContentPane().add(F_2, new org.netbeans.lib.awtextra.AbsoluteConstraints(230, 390, -1, -1));
+
+        Fecha.setFont(new java.awt.Font("Segoe UI", 0, 16)); // NOI18N
+        Fecha.setForeground(new java.awt.Color(255, 255, 255));
+        Fecha.setText("Fecha de nacimiento*");
+        getContentPane().add(Fecha, new org.netbeans.lib.awtextra.AbsoluteConstraints(120, 360, -1, -1));
+
+        Nacionalidad.setFont(new java.awt.Font("Segoe UI", 0, 16)); // NOI18N
+        Nacionalidad.setForeground(new java.awt.Color(255, 255, 255));
+        Nacionalidad.setText("Pais*");
+        getContentPane().add(Nacionalidad, new org.netbeans.lib.awtextra.AbsoluteConstraints(430, 360, -1, -1));
+
+        F_1.setFont(new java.awt.Font("Segoe UI", 0, 24)); // NOI18N
+        F_1.setForeground(new java.awt.Color(255, 255, 255));
+        F_1.setText("/");
+        getContentPane().add(F_1, new org.netbeans.lib.awtextra.AbsoluteConstraints(140, 390, -1, -1));
 
         Fondo_Registro.setBackground(new java.awt.Color(0, 0, 0));
         Fondo_Registro.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Vistas/Imagenes/Registrase.jpg"))); // NOI18N
@@ -118,6 +172,14 @@ public class Registrar extends javax.swing.JFrame {
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
+
+    private void GeneroActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_GeneroActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_GeneroActionPerformed
+
+    private void DiaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_DiaActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_DiaActionPerformed
 
     /**
      * @param args the command line arguments
@@ -157,9 +219,16 @@ public class Registrar extends javax.swing.JFrame {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     public javax.swing.JLabel Apellido;
     private javax.swing.JLabel Apellido_2;
+    public javax.swing.JTextField Año;
+    public javax.swing.JTextField Dia;
+    private javax.swing.JLabel F_1;
+    private javax.swing.JLabel F_2;
+    private javax.swing.JLabel Fecha;
     private javax.swing.JLabel Fondo_Registro;
     public javax.swing.JComboBox<String> Genero;
     private javax.swing.JLabel Genero_;
+    public javax.swing.JTextField Mes;
+    private javax.swing.JLabel Nacionalidad;
     public javax.swing.JTextField Primer_Apellido;
     public javax.swing.JTextField Primer_Nombre;
     public javax.swing.JButton Registrarse;
@@ -168,6 +237,7 @@ public class Registrar extends javax.swing.JFrame {
     public javax.swing.JTextField Segundo_Nombre;
     private javax.swing.JLabel Titulo;
     private javax.swing.JLabel Titulo_dos;
+    private javax.swing.JComboBox<String> jComboBox1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     // End of variables declaration//GEN-END:variables
